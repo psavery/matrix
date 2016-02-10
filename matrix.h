@@ -40,8 +40,13 @@ class Matrix {
   void setElement(size_t i, size_t j, double n) {m_matrix[i][j] = n;};
   double getElement(size_t i, size_t j) const {return m_matrix[i][j];};
 
+  // Scalar multiplication!
+  Matrix operator*(double s) const;
+
   // Matrix multiplication!
   Matrix operator*(const Matrix& other) const;
+
+  double getDeterminant() const;
 
   void printMatrix(size_t precision = 10, size_t width = 15) const;
 

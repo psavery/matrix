@@ -1,10 +1,13 @@
 
-#include <iomanip>
-#include <iostream>
+#include <cmath> // pow
+#include <iomanip> // setw
+#include <iostream> // cout
 
 #include "matrix.h"
 
 using namespace std;
+
+const static size_t MAX_SIZE = 100;
 
 Matrix::Matrix(size_t numRows, size_t numColumns)
 {
@@ -50,6 +53,20 @@ Matrix::~Matrix()
 
 }
 
+// Scalar multiplication
+Matrix Matrix::operator*(double s) const
+{
+  Matrix ret(this->getNumRows(), this->getNumColumns());
+
+  for (size_t i = 0; i < ret.getNumRows(); i++) {
+    for (size_t j = 0; j < ret.getNumColumns(); j++) {
+      ret.setElement(i, j, m_matrix[i][j] * s);
+    }
+  }
+
+  return ret;
+}
+
 // *this * other
 Matrix Matrix::operator*(const Matrix& other) const
 {
@@ -81,7 +98,55 @@ Matrix Matrix::operator*(const Matrix& other) const
   }
 
   return ret;
+}
 
+double determ(double a[MAX_SIZE][MAX_SIZE], int n)
+{
+  double det = 0, temp[MAX_SIZE][MAX_SIZE];
+  size_t p, h, k, i, j;
+  if (n == 1) return a[0][0];
+  else if (n == 2) {
+    det = (a[0][0]*a[1][1]-a[0][1]*a[1][0]);
+    return det;
+  } else {
+    for(p = 0; p < n; p++) {
+      h = 0;
+      k = 0;
+      for(i = 1; i < n; i++) {
+        for(j = 0; j < n; j++) {
+          if(j == p) {
+            continue;
+          }
+          temp[h][k] = a[i][j];
+          k++;
+          if(k == n-1) {
+            h++;
+            k = 0;
+          }
+        }
+      }
+      det += a[0][p] * pow(-1, p) * determ(temp, n - 1);
+    }
+    return det;
+  }
+}
+
+double Matrix::getDeterminant() const
+{
+  if (!this->isSquare()) {
+    cout << "Error: " << __FUNCTION__ << " was called on a matrix that is not "
+         << "square! Returning -1\n";
+    return -1;
+  }
+
+  double temp[MAX_SIZE][MAX_SIZE];
+  for (size_t i = 0; i < getNumRows(); i++) {
+    for (size_t j = 0; j < getNumColumns(); j++) {
+      temp[i][j] = m_matrix[i][j];
+    }
+  }
+
+  return determ(temp, getNumRows());
 }
 
 void Matrix::printMatrix(size_t precision, size_t width) const
